@@ -1,0 +1,22 @@
+#!/bin/bash -l
+#SBATCH --job-name="CRAY"
+#SBATCH --time=00:5:00
+#SBATCH --ntasks=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --ntasks-per-core=1
+#SBATCH --cpus-per-task=1
+#SBATCH --hint=nomultithread
+#SBATCH --output=effo_exe.1.1.1.1.1.htno-dom.
+#SBATCH --error=effo_exe.1.1.1.1.1.htno-dom.
+#SBATCH --constraint=mc
+module load daint-mc
+module unload PrgEnv-cray
+module load PrgEnv-intel
+export OMP_NUM_THREADS=1
+XX=/apps/common/UES/intel/2019 ;source $XX/advisor_2019/advixe-vars.sh ;echo 2>&1
+module list -t
+ulimit -s unlimited
+ulimit -c unlimited
+
+srun --unbuffered --ntasks=$SLURM_NTASKS --ntasks-per-node=$SLURM_NTASKS_PER_NODE --cpus-per-task=$SLURM_CPUS_PER_TASK --ntasks-per-core=$SLURM_NTASKS_PER_CORE --cpu_bind=verbose advixe-cl --ignore-app-mismatch -verbose -collect tripcounts -flop -project-dir=$SCRATCH/roofline/ver0 -data-limit=0 -- $PWD/exe 2>&1
+env &> env.txt
